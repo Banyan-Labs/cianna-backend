@@ -10,7 +10,7 @@ import corsOptions from "./config/corsOptions";
 import credentials from "./src/middleware/credentials";
 import cors from "cors";
 import mongoose from "mongoose";
-// import userRoutes from "./src/routes/userRoutes";
+import userRoutes from "./src/routes/userRoutes";
 // import publicRoutes from "./src/routes/publicRoutes";
 import refreshRoute from "./src/routes/refreshTokenRoute";
 // import adminRoutes from "./src/routes/adminRoutes";
@@ -54,7 +54,6 @@ router.use((req, res, next) => {
 // router.use("/api/public", publicRoutes);
 // router.use("/api/cmd", adminRoutes);
 // router.use("/api/internal", employeeRoutes);
-// router.use("/api", userRoutes);
 
 router.get('/', (req, res) => {
   return res.send("hello universe")
@@ -64,8 +63,9 @@ router.get('/test', (req, res) => {
   return res.json({ msg: 'test' })
 })
 
-router.use('/api', routes);
+router.use('/api/deploy-test', routes);
 router.use("/api/rf", refreshRoute);
+router.use("/api", userRoutes);
 
 /**Errors */
 router.use((req, res, next) => {
