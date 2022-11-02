@@ -1,5 +1,7 @@
 // import http from "http";
-require("dotenv").config();
+if (process.env.NODE_ENV !== 'deploy') {
+  require("dotenv").config();
+}
 import express from "express";
 import logging from "./config/logging";
 import config from "./config/config";
