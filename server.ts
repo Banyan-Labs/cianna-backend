@@ -14,7 +14,7 @@ import mongoose from "mongoose";
 // import publicRoutes from "./src/routes/publicRoutes";
 import refreshRoute from "./src/routes/refreshTokenRoute";
 import adminRoutes from "./src/routes/adminRoutes";
-// import employeeRoutes from "./src/routes/employeeRoutes";
+import employeeRoutes from "./src/routes/employeeRoutes";
 import routes from './src/routes/deployTestRoutes';
  
 const router = express();
@@ -51,7 +51,6 @@ router.use((req, res, next) => {
 });
 
 /**Routes */
-// router.use("/api/internal", employeeRoutes);
 
 router.get('/', (req, res) => {
   return res.send("hello universe")
@@ -64,13 +63,14 @@ router.get('/test', (req, res) => {
 router.use('/api/deploy-test', routes);
 router.use("/api/rf", refreshRoute);
 router.use("/api/cmd", adminRoutes);
+router.use("/api/internal", employeeRoutes);
 // router.use("/api/public", publicRoutes); << -- crashes app
 // router.use("/api", userRoutes); <<-- crashes app
 
 /**Errors */
 router.use((req, res, next) => {
   const error = new Error("not found");
-
+  
   return res.status(404).json({
     message: error.message,
   });
