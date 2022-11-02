@@ -2,7 +2,7 @@
   "name": "cianna-api",
   "version": "1.0.0",
   "engines": {
-    "node": "16.x",
+    "node": "18.x",
     "npm": "8.11.0"
   },
   "description": "",
