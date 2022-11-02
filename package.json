@@ -7,7 +7,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "nodemon --config nodemon.json src/server.ts",
+    "dev": "nodemon --config nodemon.json server.ts",
     "start:server": "ts-node server.ts",
     "start:test": "ts-node index.ts"
   },

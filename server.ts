@@ -1,4 +1,4 @@
-import http from "http";
+// import http from "http";
 require("dotenv").config();
 import express from "express";
 import logging from "./config/logging";
@@ -17,7 +17,7 @@ import employeeRoutes from "./src/routes/employeeRoutes";
 const router = express();
 
 /** Server Handler */
-const httpServer = http.createServer(router);
+// const httpServer = http.createServer(router);
 router.use(credentials);
 router.use(cookieParser());
 
@@ -64,7 +64,7 @@ router.use((req, res, next) => {
 });
 
 /**Requests */
-httpServer.listen(config.server.port, () => {
+router.listen(config.server.port, () => {
   logging.info(
     `Server is running at ${config.server.host}:${config.server.port}`
   );
