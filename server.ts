@@ -10,12 +10,13 @@ import corsOptions from "./config/corsOptions";
 import credentials from "./src/middleware/credentials";
 import cors from "cors";
 import mongoose from "mongoose";
-// import userRoutes from "./src/routes/userRoutes";
-// import publicRoutes from "./src/routes/publicRoutes";
 import refreshRoute from "./src/routes/refreshTokenRoute";
 import adminRoutes from "./src/routes/adminRoutes";
-import employeeRoutes from "./src/routes/employeeRoutes";
 import routes from './src/routes/deployTestRoutes';
+
+// import userRoutes from "./src/routes/userRoutes";
+// import publicRoutes from "./src/routes/publicRoutes";
+// import employeeRoutes from "./src/routes/employeeRoutes";
  
 const router = express();
 
@@ -63,7 +64,7 @@ router.get('/test', (req, res) => {
 router.use('/api/deploy-test', routes);
 router.use("/api/rf", refreshRoute);
 router.use("/api/cmd", adminRoutes);
-router.use("/api/internal", employeeRoutes);
+// router.use("/api/internal", employeeRoutes); <<-- crashes app
 // router.use("/api/public", publicRoutes); << -- crashes app
 // router.use("/api", userRoutes); <<-- crashes app
 
