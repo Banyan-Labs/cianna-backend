@@ -10,11 +10,11 @@ import corsOptions from "./config/corsOptions";
 import credentials from "./src/middleware/credentials";
 import cors from "cors";
 import mongoose from "mongoose";
-import userRoutes from "./src/routes/userRoutes";
+// import userRoutes from "./src/routes/userRoutes";
 import publicRoutes from "./src/routes/publicRoutes";
-import refreshRoute from "./src/routes/refreshTokenRoute";
-import adminRoutes from "./src/routes/adminRoutes";
-import employeeRoutes from "./src/routes/employeeRoutes";
+// import refreshRoute from "./src/routes/refreshTokenRoute";
+// import adminRoutes from "./src/routes/adminRoutes";
+// import employeeRoutes from "./src/routes/employeeRoutes";
 
 const router = express();
 
