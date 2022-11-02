@@ -11,11 +11,12 @@ import credentials from "./src/middleware/credentials";
 import cors from "cors";
 import mongoose from "mongoose";
 // import userRoutes from "./src/routes/userRoutes";
-import publicRoutes from "./src/routes/publicRoutes";
+// import publicRoutes from "./src/routes/publicRoutes";
 // import refreshRoute from "./src/routes/refreshTokenRoute";
 // import adminRoutes from "./src/routes/adminRoutes";
 // import employeeRoutes from "./src/routes/employeeRoutes";
-
+import routes from './src/routes/deployTestRoutes';
+ 
 const router = express();
 
 /** Server Handler */
@@ -50,7 +51,7 @@ router.use((req, res, next) => {
 });
 
 /**Routes */
-router.use("/api/public", publicRoutes);
+// router.use("/api/public", publicRoutes);
 // router.use("/api/rf", refreshRoute);
 // router.use("/api/cmd", adminRoutes);
 // router.use("/api/internal", employeeRoutes);
@@ -63,6 +64,8 @@ router.get('/', (req, res) => {
 router.get('/test', (req, res) => {
   return res.json({ msg: 'test' })
 })
+
+router.use('/api', )
 
 /**Errors */
 router.use((req, res, next) => {
