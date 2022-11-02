@@ -12,7 +12,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 // import userRoutes from "./src/routes/userRoutes";
 // import publicRoutes from "./src/routes/publicRoutes";
-// import refreshRoute from "./src/routes/refreshTokenRoute";
+import refreshRoute from "./src/routes/refreshTokenRoute";
 // import adminRoutes from "./src/routes/adminRoutes";
 // import employeeRoutes from "./src/routes/employeeRoutes";
 import routes from './src/routes/deployTestRoutes';
@@ -52,7 +52,6 @@ router.use((req, res, next) => {
 
 /**Routes */
 // router.use("/api/public", publicRoutes);
-// router.use("/api/rf", refreshRoute);
 // router.use("/api/cmd", adminRoutes);
 // router.use("/api/internal", employeeRoutes);
 // router.use("/api", userRoutes);
@@ -66,6 +65,7 @@ router.get('/test', (req, res) => {
 })
 
 router.use('/api', routes);
+router.use("/api/rf", refreshRoute);
 
 /**Errors */
 router.use((req, res, next) => {
