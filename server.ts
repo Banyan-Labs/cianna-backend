@@ -50,11 +50,11 @@ router.use((req, res, next) => {
 });
 
 /**Routes */
-router.use("/api/rf", refreshRoute);
 router.use("/api/public", publicRoutes);
-router.use("/api/cmd", adminRoutes);
-router.use("/api/internal", employeeRoutes);
-router.use("/api", userRoutes);
+// router.use("/api/rf", refreshRoute);
+// router.use("/api/cmd", adminRoutes);
+// router.use("/api/internal", employeeRoutes);
+// router.use("/api", userRoutes);
 
 router.get('/', (req, res) => {
   return res.send("hello universe")
