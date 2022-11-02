@@ -15,8 +15,8 @@ import adminRoutes from "./src/routes/adminRoutes";
 import routes from './src/routes/deployTestRoutes';
 
 import publicRoutes from "./src/routes/publicRoutes";
-// import userRoutes from "./src/routes/userRoutes";
-// import employeeRoutes from "./src/routes/employeeRoutes";
+import userRoutes from "./src/routes/userRoutes";
+import employeeRoutes from "./src/routes/employeeRoutes";
  
 const router = express();
 
@@ -65,8 +65,8 @@ router.use('/api/deploy-test', routes);
 router.use("/api/rf", refreshRoute);
 router.use("/api/cmd", adminRoutes);
 router.use("/api/public", publicRoutes); // << -- crashes app
-// router.use("/api", userRoutes); <<-- crashes app
-// router.use("/api/internal", employeeRoutes); <<-- crashes app
+router.use("/api", userRoutes); //<<-- crashes app
+router.use("/api/internal", employeeRoutes); //<<-- crashes app
 
 /**Errors */
 router.use((req, res, next) => {
