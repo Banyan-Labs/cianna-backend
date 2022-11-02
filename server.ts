@@ -65,7 +65,7 @@ router.get('/test', (req, res) => {
   return res.json({ msg: 'test' })
 })
 
-router.use('/api', )
+router.use('/api', routes);
 
 /**Errors */
 router.use((req, res, next) => {
