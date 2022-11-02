@@ -10,11 +10,11 @@ import corsOptions from "./config/corsOptions";
 import credentials from "./src/middleware/credentials";
 import cors from "cors";
 import mongoose from "mongoose";
-// import userRoutes from "./src/routes/userRoutes";
-// import publicRoutes from "./src/routes/publicRoutes";
-// import refreshRoute from "./src/routes/refreshTokenRoute";
-// import adminRoutes from "./src/routes/adminRoutes";
-// import employeeRoutes from "./src/routes/employeeRoutes";
+import userRoutes from "./src/routes/userRoutes";
+import publicRoutes from "./src/routes/publicRoutes";
+import refreshRoute from "./src/routes/refreshTokenRoute";
+import adminRoutes from "./src/routes/adminRoutes";
+import employeeRoutes from "./src/routes/employeeRoutes";
 
 const router = express();
 
@@ -50,11 +50,11 @@ router.use((req, res, next) => {
 });
 
 /**Routes */
-// router.use("/api/rf", refreshRoute);
-// router.use("/api/public", publicRoutes);
-// router.use("/api/cmd", adminRoutes);
-// router.use("/api/internal", employeeRoutes);
-// router.use("/api", userRoutes);
+router.use("/api/rf", refreshRoute);
+router.use("/api/public", publicRoutes);
+router.use("/api/cmd", adminRoutes);
+router.use("/api/internal", employeeRoutes);
+router.use("/api", userRoutes);
 
 router.get('/', (req, res) => {
   return res.send("hello universe")
