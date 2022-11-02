@@ -8,7 +8,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon --config nodemon.json src/server.ts",
-    "start:server": "ts-node src/server.ts",
+    "start:server": "ts-node server.ts",
     "start:test": "ts-node index.ts"
   },
   "author": "",

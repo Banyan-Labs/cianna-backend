@@ -1,18 +1,18 @@
 import http from "http";
 require("dotenv").config();
 import express from "express";
-import logging from "../config/logging";
-import config from "../config/config";
+import logging from "./config/logging";
+import config from "./config/config";
 import cookieParser from "cookie-parser";
-import corsOptions from "../config/corsOptions";
-import credentials from "./middleware/credentials";
+import corsOptions from "./config/corsOptions";
+import credentials from "./src/middleware/credentials";
 import cors from "cors";
 import mongoose from "mongoose";
-import userRoutes from "./routes/userRoutes";
-import publicRoutes from "./routes/publicRoutes";
-import refreshRoute from "./routes/refreshTokenRoute";
-import adminRoutes from "./routes/adminRoutes";
-import employeeRoutes from "./routes/employeeRoutes";
+import userRoutes from "./src/routes/userRoutes";
+import publicRoutes from "./src/routes/publicRoutes";
+import refreshRoute from "./src/routes/refreshTokenRoute";
+import adminRoutes from "./src/routes/adminRoutes";
+import employeeRoutes from "./src/routes/employeeRoutes";
 
 const router = express();
 
