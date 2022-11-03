@@ -17,4 +17,4 @@ router
   .post("/new-sr", srController.addInfo)
   .delete("/delete-sr", srController.deleteData);
 
-export = router;
+export default router;

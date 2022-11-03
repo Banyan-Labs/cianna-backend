@@ -42,4 +42,4 @@ router
   .post("/account-rfps", rfpController.getAccountRFPS)
   .post("/find-rfp", rfpController.findRFP)
   .delete("/delete-rfp", rfpController.deleteRFP);
-export = router;
+export default router;

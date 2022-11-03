@@ -12,4 +12,4 @@ verifyAuthorization(ROLES_LIST.ADMIN),
     .post("/create-user", controller.createNewUser)
     .get("/get-users", controller.getAllUsers);
 
-export = router;
+export default router;
