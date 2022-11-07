@@ -87,6 +87,7 @@ const getRoom = async (req: Request, res: Response) => {
         keys.map((keyName: string) => {
           room[keyName] = parameters[keyName];
         });
+        room.save();
       }
       console.log(`room: ${room?.name} retrieved`);
       return res.status(200).json({
