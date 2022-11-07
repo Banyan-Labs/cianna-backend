@@ -15,6 +15,6 @@ router
   .post("/find-light", catalogController.getLight)
   .post("/remove-light", catalogController.removeLight)
   .post("/new-sr", srController.addInfo)
-  .delete("/delete-sr", srController.deleteData);
+  .post("/delete-sr", srController.deleteData);
 
 export default router;
