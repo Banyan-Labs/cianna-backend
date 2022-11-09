@@ -1,5 +1,11 @@
 import { Document } from "mongoose";
 
+interface ProjectActivity {
+  createUpdate: string;
+  rooms: string[];
+  archiveRestore: string[];
+  status: string[];
+}
 export default interface projectInterface extends Document {
   archived: boolean;
   name: string;
@@ -10,4 +16,5 @@ export default interface projectInterface extends Document {
   description: string;
   rfp: string;
   rooms: string[];
+  activity: ProjectActivity
 }

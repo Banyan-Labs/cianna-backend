@@ -14,7 +14,8 @@ const createProject = async (req: Request, res: Response) => {
     region,
     status,
     rooms,
-    copy } = req.body;
+    copy,
+  } = req.body;
   /**
    * If you are copying an instance of someone elses project or room, you have to pass in the userId, not the project clientId
    */
@@ -22,7 +23,7 @@ const createProject = async (req: Request, res: Response) => {
   if (_id && copy === "room") {
     Room.findOne({ _id: rooms[0] })
       .then(async (foundRoom) => {
-        await runRoom(foundRoom, _id, clientId);
+        await runRoom(foundRoom, _id, clientId, true);
         return res.status(201).json({
           message: `copy of room ${rooms[0]}`,
         });
@@ -38,7 +39,7 @@ const createProject = async (req: Request, res: Response) => {
     const project = new Project({
       _id: new mongoose.Types.ObjectId(),
       archived: false,
-      name: copy === 'project' ? `Copy of ${name}` : name,
+      name: copy === "project" ? `Copy of ${name}` : name,
       clientId: clientId,
       clientName: clientName,
       region: region,
@@ -46,6 +47,17 @@ const createProject = async (req: Request, res: Response) => {
       description: description,
       rfp: "",
       rooms: [],
+      activity: {
+        createUpdate: `Created on ${new Date()
+          .toISOString()
+          .split("T")[0]
+          .split("-")
+          .reverse()
+          .join("/")}`,
+        rooms: [],
+        archiveRestore: [],
+        status: [status]
+      },
     });
 
     return await project
@@ -56,7 +68,7 @@ const createProject = async (req: Request, res: Response) => {
             for (let i = 0; i < rooms.length; i++) {
               await Room.findOne({ _id: rooms[i] })
                 .then(async (foundRoom) => {
-                  await runRoom(foundRoom, project._id, clientId);
+                  await runRoom(foundRoom, project._id, clientId, false);
                 })
                 .catch((error) => {
                   console.log(error, "error rinding room line 65");
@@ -87,13 +99,14 @@ const getProject = async (req: Request, res: Response) => {
   const parameters = Object.fromEntries(
     keys.map((key: string) => [key, req.body[key.toString()]])
   );
-
+console.log("KEYS: ", keys)
   return await Project.findOne({ _id: req.body._id })
     .exec()
-    .then((project) => {
+    .then(async(project) => {
       console.log(project, "PROJECT");
       console.log(`project: ${project?.name} retrieved`);
-      if (project && keys.length) {
+      if(project){
+      if (keys.length) {
         keys.map((keyName: string) => {
           switch (keyName) {
             case "name":
@@ -107,16 +120,68 @@ const getProject = async (req: Request, res: Response) => {
               break;
             case "status":
               project.status = parameters["status"];
+              project.activity = {
+                ...project.activity, status: parameters["status"]
+              };
               break;
             case "description":
               project.description = parameters["description"];
+            case "activityClear":
+              project.activity.rooms = parameters["activityClear"];
+              project.activity.archiveRestore = parameters["activityClear"]
+            case "activity":
+              project.activity = {
+                ...project.activity, archiveRestore: [
+                  `Project ${parameters["activity"]}ed on ${new Date()
+                    .toISOString()
+                    .split("T")[0]
+                    .split("-")
+                    .reverse()
+                    .join("/")}`,
+                  ...project.activity.archiveRestore,
+                ]
+              };
               break;
             default:
               null;
           }
         });
-        project.save();
+        if(project.activity){
+          
+
+        project.activity = {
+          createUpdate: `Updated on ${new Date()
+            .toISOString()
+            .split("T")[0]
+            .split("-")
+            .reverse()
+            .join("/")}`,
+          rooms:  project.activity.rooms, 
+          archiveRestore: project.activity.archiveRestore,
+          status:  project.activity.status || [project.status]
+          
+        };
+        }
+
+        // project.save();
+      }else{
+      
+
+        project.activity = {
+          createUpdate: `Updated on ${new Date()
+            .toISOString()
+            .split("T")[0]
+            .split("-")
+            .reverse()
+            .join("/")}`,
+          rooms: [],
+          archiveRestore:  [],
+          status: []
+        }; 
+        
       }
+      await project.save()
+    }
       return res.status(200).json({
         project,
       });
@@ -125,7 +190,12 @@ const getProject = async (req: Request, res: Response) => {
       return res.status(500).json({ message: error.message, error });
     });
 };
-const runRoom = async (room: any, newProjectId: string, clientId: string) => {
+const runRoom = async (
+  room: any,
+  newProjectId: string,
+  clientId: string,
+  roomOnly: boolean
+) => {
   const { name, description, lights } = room;
 
   const newRoom = new Room({
@@ -139,6 +209,14 @@ const runRoom = async (room: any, newProjectId: string, clientId: string) => {
   const roomAndProject = await Project.findOne({ _id: newProjectId });
 
   if (roomAndProject) {
+    if (roomOnly === true) {
+      roomAndProject.activity.createUpdate = `Updated on ${new Date()
+        .toISOString()
+        .split("T")[0]
+        .split("-")
+        .reverse()
+        .join("/")}`;
+    }
     roomAndProject.rooms = [...roomAndProject.rooms, newRoom._id];
     roomAndProject.save();
   }
@@ -225,13 +303,15 @@ const getAllProjects = async (req: Request, res: Response) => {
   const security = check.filter(
     (x) => x === "status" || x === "region" || x === "clientName"
   );
-  const workingUpdate = Object.fromEntries(security.map((x) => [x, req.body[x]]));
-  console.log("payload proj filter: ",{...workingUpdate})
+  const workingUpdate = Object.fromEntries(
+    security.map((x) => [x, req.body[x]])
+  );
+  console.log("payload proj filter: ", { ...workingUpdate });
 
   if (security.length && check.length === security.length) {
     await Project.find({ ...workingUpdate })
       .then((projects) => {
-        console.log(projects)
+        console.log(projects);
         return res.status(200).json({
           projects,
         });

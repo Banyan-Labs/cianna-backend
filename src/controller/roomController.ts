@@ -16,10 +16,13 @@ const createRoom = async (req: Request, res: Response, next: NextFunction) => {
   });
  const roomAndProject = await Project.findByIdAndUpdate({ _id: projectId })
     .exec()
-    .then((project) => {
+    .then(async(project) => {
       if (project) {
         project.rooms = [...project.rooms, room._id];
-        project.save();
+        project.activity = {
+          ...project.activity, rooms: [...project.activity.rooms, `Room ${name} added, ID: ${room._id}.`]
+        }
+        await project.save();
         console.log(project, "PROJECT FOUND AND UPDATED");
         const projectSuccess = `added room to project: ${projectId}`;
         return room
@@ -104,10 +107,14 @@ const deleteRoom = async (req: Request, res: Response) => {
     .exec()
     .then(async (project) => {
       if (project) {
+        project.activity = {
+          ...project.activity, rooms: [...project.activity.rooms, `Project ID-${req.body._id} Deleted, ID: ${req.body._id}.`]
+        }
         project.rooms = project.rooms.filter((id: string) => {
           return String(id) !== req.body._id ? id : "";
         });
-        project.save();
+        console.log("Project updated DELETEROOM: ", project)
+        await project.save();
       }
       const roomRemoved = "room removed successfully from project";
       await LightSelection.deleteMany({ roomId: req.body._id })
