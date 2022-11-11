@@ -1,10 +1,14 @@
 import { Document } from "mongoose";
 
+interface activity{
+
+}
+
 interface ProjectActivity {
   createUpdate: string;
-  rooms: string[];
-  archiveRestore: string[];
-  status: string[];
+  rooms: string[][];
+  archiveRestore: string[][];
+  status: string[][];
 }
 export default interface projectInterface extends Document {
   archived: boolean;

@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import Project from "../model/Project";
 import Room from "../model/Room";
 import LightSelection from "../model/LIghtSelection";
+const curDate = new Date().toISOString().split("T")[0].split("-");
 
 const createRoom = async (req: Request, res: Response, next: NextFunction) => {
   const { name, description, clientId, projectId } = req.body;
@@ -20,10 +21,11 @@ const createRoom = async (req: Request, res: Response, next: NextFunction) => {
       if (project) {
         project.rooms = [...project.rooms, room._id];
         project.activity = {
-          ...project.activity, rooms: [...project.activity.rooms, `Room ${name} added, ID: ${room._id}.`]
+          ...project.activity, rooms: [...project.activity.rooms, [`Room ${name} added, ID: ${room._id}.`, `${[curDate[1], curDate[2], curDate[0]].join(
+            "/"
+          )}`]]
         }
         await project.save();
-        console.log(project, "PROJECT FOUND AND UPDATED");
         const projectSuccess = `added room to project: ${projectId}`;
         return room
           .save()
@@ -108,7 +110,9 @@ const deleteRoom = async (req: Request, res: Response) => {
     .then(async (project) => {
       if (project) {
         project.activity = {
-          ...project.activity, rooms: [...project.activity.rooms, `Project ID-${req.body._id} Deleted, ID: ${req.body._id}.`]
+          ...project.activity, rooms: [...project.activity.rooms, [`Project Deleted, ID: ${req.body._id}.`, `${[curDate[1], curDate[2], curDate[0]].join(
+            "/"
+          )}`]]
         }
         project.rooms = project.rooms.filter((id: string) => {
           return String(id) !== req.body._id ? id : "";
