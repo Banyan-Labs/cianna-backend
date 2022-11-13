@@ -52,9 +52,13 @@ const getData = async (req: Request, res: Response) => {
                 if(pdf.length){
                     proj.pdf = [...pdf, ...proj.pdf]
                 }
-            }else if(edit === 'replace'){               
+            }else if(edit === 'replace'){   
+                if(images ){            
                     proj.images = [...images];
+                }
+                if(pdf ){
                     proj.pdf = [...pdf]
+                }
             }
             await proj.save();
             }
