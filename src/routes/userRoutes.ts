@@ -9,6 +9,7 @@ import catalogController from "../controller/catalogController";
 import userController from "../controller/userController";
 import ROLES_LIST from "../../config/rolesList";
 import multiUpload from "../middleware/fileUpload";
+import projectAttchmentController from "../controller/projectAttchmentController";
 
 const router = express.Router();
 
@@ -23,6 +24,11 @@ router
   .post("/find-project", projectController.getProject)
   .post("/create-project", projectController.createProject)
   .post("/delete-project", projectController.deleteProject)
+
+  //ProjAttachments
+  .post("/new-attachments", projectAttchmentController.addAttachmentSection)
+  .post("/get-attachments", projectAttchmentController.getData)
+  .post("/delete-attachments", projectAttchmentController.deleteData)
   // Room Routes
   .post("/get-rooms", roomController.getAllRooms)
   .post("/find-room", roomController.getRoom)
