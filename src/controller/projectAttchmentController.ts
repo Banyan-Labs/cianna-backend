@@ -3,12 +3,18 @@ import mongoose from "mongoose";
 import ProjectAttachments from "../model/ProjectAttachments";
 
 const addAttachmentSection = async( req: Request, res: Response) =>{
-    const {projId, images, rfp} = req.body
+    const {projId, images, pdf} = req.body
 
+    await ProjectAttachments.findOne({projId}).then(async(existing)=>{
+        if(existing){
+            return res.status(400).json({
+                message: `Attachment file exists with id of ${existing._id}.`
+            })
+        }else{
     const projectAttchments = new ProjectAttachments({
         projectId: projId,
-        images: images.length ? images : [],
-        rfp: rfp.length ? rfp : []
+        images: images ? images : [],
+        pdf: pdf ? pdf : []
     });
     return await projectAttchments.save()
             .then((attachments)=>{
@@ -23,6 +29,12 @@ const addAttachmentSection = async( req: Request, res: Response) =>{
                     message: error.message
                 })
             })
+        }
+        }).catch((error)=>{
+            return res.status(500).json({
+                message: error.message
+            })
+        })
     
 }
 const getData = async (req: Request, res: Response) => {
@@ -40,13 +52,9 @@ const getData = async (req: Request, res: Response) => {
                 if(pdf.length){
                     proj.pdf = [...pdf, ...proj.pdf]
                 }
-            }else if(edit === 'replace'){
-                if(images.length){
+            }else if(edit === 'replace'){               
                     proj.images = [...images];
-                }
-                if(pdf.length){
                     proj.pdf = [...pdf]
-                } 
             }
             await proj.save();
             }
