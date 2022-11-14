@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 import ProjectAttachments from "../model/ProjectAttachments";
 
 const addAttachmentSection = async( req: Request, res: Response) =>{
+    console.log(req.body)
     const {projId, images, pdf} = req.body
+    console.log(projId, images)
 
     await ProjectAttachments.findOne({projId}).then(async(existing)=>{
         if(existing){
@@ -38,7 +40,9 @@ const addAttachmentSection = async( req: Request, res: Response) =>{
     
 }
 const getData = async (req: Request, res: Response) => {
+    console.log(req.body)
     const { projId, images, pdf, edit } = req.body;
+    console.log(projId, images, edit)
     await ProjectAttachments
       .findOne({ projId })
       .exec()

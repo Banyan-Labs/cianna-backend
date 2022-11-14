@@ -4,6 +4,7 @@ import multiUpload from "../middleware/fileUpload";
 import verifyAuthorization from "../middleware/verifyAuthorization";
 import catalogController from "../controller/catalogController";
 import srController from "../controller/statusAndRegionController";
+import projectAttachment from "../controller/projectAttchmentController";
 import ROLES_LIST from "../../config/rolesList";
 const router = express.Router();
 

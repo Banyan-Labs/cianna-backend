@@ -26,7 +26,7 @@ router
   .post("/delete-project", projectController.deleteProject)
 
   //ProjAttachments
-  .post("/new-attachments", projectAttchmentController.addAttachmentSection)
+  .post("/new-attachments", multiUpload, projectAttchmentController.addAttachmentSection)
   .post("/get-attachments", projectAttchmentController.getData)
   .post("/delete-attachments", projectAttchmentController.deleteData)
   // Room Routes
