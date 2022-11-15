@@ -4,8 +4,9 @@ import ProjectAttachments from "../model/ProjectAttachments";
 
 const addAttachmentSection = async( req: Request, res: Response) =>{
     const {projId, images, pdf} = req.body
-
-    await ProjectAttachments.findOne({projId}).then(async(existing)=>{
+    console.log("projectId: ",projId)
+    console.log(req.body)
+    await ProjectAttachments.findOne({projectId: projId}).then(async(existing)=>{
         if(existing){
             return res.status(400).json({
                 message: `Attachment file exists with id of ${existing._id}.`
