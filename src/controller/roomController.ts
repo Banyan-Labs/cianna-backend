@@ -19,12 +19,12 @@ const createRoom = async (req: Request, res: Response, next: NextFunction) => {
     .exec()
     .then(async(project) => {
       if (project) {
-        project.rooms = [...project.rooms, room._id];
+        project.rooms = [...project.rooms, room._id];        
         project.activity = {
           ...project.activity, rooms: [...project.activity.rooms, [`Room ${name} added, ID: ${room._id}.`, `${[curDate[1], curDate[2], curDate[0]].join(
             "/"
           )}`]]
-        }
+        }        
         await project.save();
         const projectSuccess = `added room to project: ${projectId}`;
         return room

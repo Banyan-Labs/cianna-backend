@@ -109,7 +109,25 @@ const getProject = async (req: Request, res: Response) => {
   return await Project.findOne({ _id: req.body._id })
     .exec()
     .then(async (project) => {
-      console.log(project, "PROJECT");
+      console.log("Project: ", project);
+      console.log("Project activity: ", project?.activity);
+      if(project && project.activity == undefined){
+        project["activity"] = {
+          createUpdate: `Created on ${[
+            curDate[1],
+            curDate[2],
+            curDate[0],
+          ].join("/")}`,
+          rooms: [],
+          archiveRestore: [],
+          status: [
+            [
+              `Status: ${project.status}`,
+              `${[curDate[1], curDate[2], curDate[0]].join("/")}`,
+            ],
+          ],
+        };
+      }
       console.log(`project: ${project?.name} retrieved`);
       if (project) {
         if (keys.length) {
@@ -176,8 +194,7 @@ const getProject = async (req: Request, res: Response) => {
                 curDate[0],
               ].join("/")}`,
             };
-          }
-
+          } 
         }
         project.save();
       }
@@ -189,11 +206,7 @@ const getProject = async (req: Request, res: Response) => {
       return res.status(500).json({ message: error.message, error });
     });
 };
-const runRoom = async (
-  room: any,
-  newProjectId: string,
-  clientId: string,
-) => {
+const runRoom = async (room: any, newProjectId: string, clientId: string) => {
   const { name, description, lights } = room;
 
   const newRoom = new Room({
