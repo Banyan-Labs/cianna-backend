@@ -7,6 +7,7 @@ const curDate = new Date().toISOString().split("T")[0].split("-");
 
 const createRoom = async (req: Request, res: Response, next: NextFunction) => {
   const { name, description, clientId, projectId } = req.body;
+  console.log(req.body)
   const room = new Room({
     _id: new mongoose.Types.ObjectId(),
     name,
