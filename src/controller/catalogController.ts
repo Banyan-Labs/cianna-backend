@@ -40,9 +40,10 @@ const createCatalogItem = async (req: Request, res: Response) => {
     costAdmin,
     partnerCodeAdmin,
   } = req.body;
-  let {images, pdf, drawingFiles}  = req.body //[]//s3
+  let {images, pdf, specs, drawingFiles}  = req.body //[]//s3
   images = [];
   pdf = [];
+  specs = [];
   drawingFiles = [];
   if(req.files){
 
@@ -60,6 +61,8 @@ const createCatalogItem = async (req: Request, res: Response) => {
           drawingFiles.push(singleDoc.s3Upload.Location);
         } else if (singleDoc.field === "pdf") {
           pdf.push(singleDoc.s3Upload.Location);
+        } else if (singleDoc.field === "specs") {
+          specs.push(singleDoc.s3Upload.Location);
         }
       }
     }
@@ -102,6 +105,7 @@ const createCatalogItem = async (req: Request, res: Response) => {
     usePackages, //[]
     images, //[]//s3
     pdf, //[]//s3
+    specs, //[]//s3
     drawingFiles, //[]//s3
     costAdmin,
     partnerCodeAdmin,
