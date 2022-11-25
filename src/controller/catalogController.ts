@@ -131,7 +131,6 @@ const getCatalogItems = (req: Request, res: Response) => {
     (x) => x === "designStyle" || x == "usePackages"
   );
   const workArray = Object.fromEntries(check.map((x) => [x, req.body[x]]));
-
   CatalogItem.find()
     .then((items) => {
       if (check.length) {
