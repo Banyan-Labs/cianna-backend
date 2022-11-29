@@ -4,8 +4,8 @@ import ProjectAttachments from "../model/ProjectAttachments";
 
 const addAttachmentSection = async( req: Request, res: Response) =>{
     const {projId, images, pdf} = req.body
-    console.log("projectId: ",projId)
-    console.log(req.body)
+    console.log("projectId in attachments: ",projId)
+    console.log( "attchYO: ",req.body)
     await ProjectAttachments.findOne({projectId: projId}).then(async(existing)=>{
         if(existing){
             return res.status(400).json({
@@ -41,16 +41,16 @@ const addAttachmentSection = async( req: Request, res: Response) =>{
 const getData = async (req: Request, res: Response) => {
     const { projId, images, pdf, edit } = req.body;
     await ProjectAttachments
-      .findOne({ projId })
+      .findOne({ projectId: projId })
       .exec()
       .then(async(proj)=>{
         if(proj){
             if (edit.length){
             if(edit === 'add'){
-                if(images.length){
+                if(images && images.length){
                     proj.images = [...images, ...proj.images];
                 }
-                if(pdf.length){
+                if(pdf && pdf.length){
                     proj.pdf = [...pdf, ...proj.pdf]
                 }
             }else if(edit === 'replace'){   
@@ -75,6 +75,9 @@ const getData = async (req: Request, res: Response) => {
       })
       
   };
+  const getAllAttachments = async(req:Request, res:Response) =>{
+
+  }
   
   const deleteData = async (req: Request, res: Response) => {
     const { projId } = req.body;
