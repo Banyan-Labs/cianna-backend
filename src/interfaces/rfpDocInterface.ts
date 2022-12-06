@@ -6,29 +6,26 @@ export interface Schedule {
   timeFrame: string;
 }
 
-export interface Contact {
-  name: string;
-  email: string;
-  phone: string;
-  subFields: string | string[] | RfpSection[];
+export interface Finish {
+  exteriorFinish: string;
+  interiorFinish: string;
+  lensMaterial: string;
+  glassOptions: string;
+  acrylicOptions: string;
 }
 
-export interface RfpSection {
-  header: string;
+export interface ProposalTableRow {
+  itemID: string;
+  rooms: string[];
   description: string;
-  subFields: RfpSection[] | string[] | Contact[];
+  finishes: Finish;
+  subTableRow: ProposalTableRow[] | string[] | Contact[];
 }
 
 export default interface rfpDocInterface extends Document {
-  header: string;
-  projectId: string;
+  header: string; // project name && creates rfp
+  projectId: string; //projectId
   clientId: string;
-  schedule: Schedule[];
-  scope: string;
-  bid: RfpSection[];
-  submittals: RfpSection[];
-  qualityStandards: RfpSection[];
-  contactInfo: Contact[];
-  images: string[]; //s3
-  pdf: string[]; //s3
+  clientName: string; 
+  tableRow: ProposalTableRow[]
 }
