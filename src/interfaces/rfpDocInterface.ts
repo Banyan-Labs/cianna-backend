@@ -19,7 +19,10 @@ export interface ProposalTableRow {
   rooms: string[];
   description: string;
   finishes: Finish;
-  subTableRow: ProposalTableRow[] | string[] | Contact[];
+  lampType: string;
+  lampColor: string;
+  wattsPer: string;
+  subTableRow: ProposalTableRow[];
 }
 
 export default interface rfpDocInterface extends Document {
