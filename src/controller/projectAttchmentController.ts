@@ -101,10 +101,16 @@ const deleteData = async (req: Request, res: Response) => {
               }
             });
             projectAttach.images = copyOfImages;
-            const imageVSpdf = copyOfImages.map((img) => img.attachment);
+            console.log("cpyImgs: ", copyOfImages)
+            //attachments is array
+            const imageVSpdf = copyOfImages.map((img) => img.attachments).flat();
+            console.log("projAttch: ",projectAttach)
             const pdfVSimg = projectAttach.pdf.filter(
               (pdf) => imageVSpdf.indexOf(pdf) > -1
             );
+            console.log("imgPDF", imageVSpdf)
+            console.log("pdfVSIMG: ",pdfVSimg)
+            console.log("projAtchPDF: ", projId.pdf)
             if (pdfVSimg.length !== projectAttach.pdf.length) {
               projectAttach.pdf = pdfVSimg;
             }
@@ -113,8 +119,8 @@ const deleteData = async (req: Request, res: Response) => {
             const filteredPDF = projectAttach.pdf.filter(
               (internal: string) => internal !== item
             );
-            const filteredImages = projectAttach.images.filter(
-              (internal) => internal.attachment !== item
+            const filteredImages = projectAttach.images.map(
+              (internal) => Object({lightId: internal.lightId, attachments: internal.attachments.filter(attachment=> attachment !== item)})
             );
             projectAttach.pdf = filteredPDF;
             projectAttach.images = filteredImages;

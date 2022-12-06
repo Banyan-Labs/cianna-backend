@@ -2,7 +2,7 @@ import {Document} from 'mongoose'
 
 interface RoomContainer {
     lightId: string;
-    attachment:string;
+    attachments:string[];
 }
 export default interface ProjectAttachments {
     projectId: string;
