@@ -130,6 +130,7 @@ const getCatalogItems = (req: Request, res: Response) => {
   const check = Object.keys(req.body).filter(
     (x) => x === "designStyle" || x == "usePackages"
   );
+  console.log(check)
   const workArray = Object.fromEntries(check.map((x) => [x, req.body[x]]));
   CatalogItem.find()
     .then((items) => {
