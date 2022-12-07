@@ -14,7 +14,6 @@ export default interface catalogInterface extends Document {
   sconceWidth: string;
   sconceExtension: string;
   socketQuantity: number;
-  powerInWatts: number;
   estimatedWeight: number;
   price: number;
   material: string;
@@ -22,7 +21,7 @@ export default interface catalogInterface extends Document {
   lampColor: string;
   numberOfLamps: string;
   wattsPerLamp: string;
-  totalWatts: string;
+  powerInWatts: number;
   lumens: string;
   exteriorFinish: string[];
   interiorFinish: string[];

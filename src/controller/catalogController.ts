@@ -18,7 +18,6 @@ const createCatalogItem = async (req: Request, res: Response) => {
     sconceWidth,
     sconceExtension,
     socketQuantity,
-    powerInWatts,
     estimatedWeight,
     price,
     material,
@@ -26,7 +25,7 @@ const createCatalogItem = async (req: Request, res: Response) => {
     lampColor, 
     numberOfLamps, 
     wattsPerLamp, 
-    totalWatts,
+    powerInWatts,
     lumens,
     exteriorFinish, //[]
     interiorFinish, //[]
@@ -91,7 +90,6 @@ const createCatalogItem = async (req: Request, res: Response) => {
     sconceWidth,
     sconceExtension,
     socketQuantity,
-    powerInWatts,
     estimatedWeight,
     price,
     material,
@@ -99,7 +97,7 @@ const createCatalogItem = async (req: Request, res: Response) => {
     lampColor, 
     numberOfLamps, 
     wattsPerLamp, 
-    totalWatts,
+    powerInWatts,
     lumens,
     exteriorFinish, //[]
     interiorFinish, //[]
