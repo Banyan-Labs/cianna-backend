@@ -4,7 +4,7 @@ import { uploadFunc } from "../middleware/s3";
 import CatalogItem from "../model/CatalogItem";
 
 const createCatalogItem = async (req: Request, res: Response) => {
-  const {
+  let {
     item_ID,
     itemName,
     employeeID,
@@ -29,7 +29,7 @@ const createCatalogItem = async (req: Request, res: Response) => {
     acrylicOptions, //[]
     environment, //[]
     safetyCert, //[]
-    projecVoltage, //[]
+    projectVoltage, //[]
     socketType, //[]
     mounting, //[]
     crystalType, //[]
@@ -40,7 +40,42 @@ const createCatalogItem = async (req: Request, res: Response) => {
     costAdmin,
     partnerCodeAdmin,
   } = req.body;
-  let {images, pdf, specs, drawingFiles}  = req.body //[]//s3
+
+  console.log("BODY ##############: ",req.body)
+
+    console.log(typeof exteriorFinish,"~~~~~~~~~~~~")
+    console.log(typeof interiorFinish,"~~~~~~~~~~~~")
+    console.log(lensMaterial,"~~~~~~~~~~~~")
+    console.log(glassOptions, "~~~~~~~~~~~~")
+    console.log(acrylicOptions,"~~~~~~~~~~~~")
+    console.log(environment, "~~~~~~~~~~~~")
+    console.log(safetyCert, "~~~~~~~~~~~~")
+    console.log(projectVoltage, "~~~~~~~~~~~~")
+    console.log(socketType, "~~~~~~~~~~~~")
+    console.log(mounting, "~~~~~~~~~~~~")
+    console.log(crystalType, "~~~~~~~~~~~~")
+    console.log(crystalPinType,"~~~~~~~~~~~~")
+    console.log(crystalPinColor,"~~~~~~~~~~~~")
+    console.log(designStyle, "~~~~~~~~~~~~")
+    console.log(usePackages,"~~~~~~~~~~~~")
+
+
+  // const exterior = exteriorFinish.split(',');
+  // const interior = interiorFinish.split(',');
+  // const lens = lensMaterial.split(',');
+  // const glass = glassOptions.split(',');
+  // const acrylic = acrylicOptions.split(',');
+  // const env = environment.split(',');
+  // const sc = safetyCert.split(',');
+  // const voltage = projecVoltage.split(',');
+  // const socket = socketType.split(',');
+  // const mount = mounting.split(',');
+  // const crystal = crystalType.split(',');
+  // const cpt = crystalPinType.split(',');
+  // const cpColor = crystalPinColor.split(',');
+  // const design = designStyle.split(',');
+  // const pak = usePackages.split(',');
+  let {images, pdf, specs, drawingFiles}  = req.body; //[]//s3
   images = [];
   pdf = [];
   specs = [];
@@ -95,7 +130,7 @@ const createCatalogItem = async (req: Request, res: Response) => {
     acrylicOptions, //[]
     environment, //[]
     safetyCert, //[]
-    projecVoltage, //[]
+    projectVoltage, //[]
     socketType, //[]
     mounting, //[]
     crystalType, //[]
