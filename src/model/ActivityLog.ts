@@ -8,7 +8,6 @@ const activitySchema: Schema = new Schema(
     userId: { type: String, required: true },
     name: { type: String, required: true },
     role: { type: String, required: true },
-    location: { type: String, select: false },
   },
   {
     timestamps: true,
