@@ -13,7 +13,8 @@ verifyAuthorization(ROLES_LIST.ADMIN),
   router
     .post("/create-user", controller.createNewUser)
     .get("/get-users", controller.getAllUsers)
-    .post("/getAllLogs", activityController.getAllLogs);
+    .post("/getAllLogs", activityController.getAllLogs)
+    .post("/deleteLog", activityController.deleteLog);
    
 
 export default router;

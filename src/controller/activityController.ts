@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import Activity from "../model/ActivityLog";
 
-const curDate = new Date().toISOString().split("T")[0].split("-");
+
 
 const createActivityLog = async (req: Request, res: Response, next: NextFunction) => {
   const { name, userId, ipAddress, role } = req.body;
@@ -66,12 +66,39 @@ const getAllLogs = (req: Request, res: Response) => {
     .exec()
     .then((results) => {
       return res.status(200).json({
-        logs: results,
+        logs: results.reverse(),
         count: results.length,
       });
     });
 };
 
+const getUserLogs = (req: Request, res: Response) => {
+  const {userId} = req.body;
+  Activity.findOne({ userId })
+    .exec()
+    .then((results) => {
+      return res.status(200).json({
+        logs: results
+      });
+    });
+};
 
 
-export default { createActivityLog, getAllLogs };
+const deleteLog = async (req: Request, res: Response) => {
+    console.log(req.body._id, 'delete log')
+    await Activity.findOneAndDelete({ _id: req.body._id })
+    .then((data) => {
+      return res.status(200).json({
+        message: `Successfully deleted ${req.body._id}`,
+      });
+    })
+    .catch((error) => {
+      return res.status(500).json({
+        message: error.message,
+        error,
+      });
+    });
+};
+
+
+export default { createActivityLog, getAllLogs, deleteLog };
