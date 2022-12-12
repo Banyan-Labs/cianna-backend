@@ -16,7 +16,7 @@ console.log(req.body)
         console.log(log.ipAddress)
         log.save()
           .then((updatedLog) => {
-            console.log(updatedLog, 'shit')
+            console.log(updatedLog, 'updated log')
              res.status(201).json({
               updatedLog,
             });
@@ -62,7 +62,6 @@ console.log(req.body)
 
 
 const getAllLogs = (req: Request, res: Response) => {
-  console.log("getallLogs");
   Activity.find()
     .exec()
     .then((results) => {
