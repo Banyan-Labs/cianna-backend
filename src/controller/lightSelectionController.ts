@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
+import { Finish, ProposalTableRow } from "../interfaces/rfpDocInterface";
 import LightSelection from "../model/LIghtSelection";
+import RFP from "../model/RFP";
 import Room from "../model/Room";
 
 const lightSelected = async (
@@ -61,11 +63,16 @@ const lightSelected = async (
         const roomSuccess = `added light to room: ${roomId}`;
         return light
           .save()
-          .then((light) => {
-            return res.status(201).json({
-              light,
-              message: roomSuccess,
-            });
+          .then(async (light) => {
+            if (light) {
+              const updated = await rfpUpdater(req.body.light);
+              if (updated) {
+                return res.status(201).json({
+                  light,
+                  message: roomSuccess,
+                });
+              }
+            }
           })
           .catch((error) => {
             return res.status(500).json({
@@ -83,8 +90,120 @@ const lightSelected = async (
         error,
       });
     });
+
   return lightAndRoom;
 };
+const rfpUpdater = async (body: any) => {
+  const {
+    item_ID,
+    exteriorFinish,
+    interiorFinish,
+    lensMaterial,
+    glassOptions,
+    acrylicOptions,
+    roomName,
+    projectId,
+    quantity,
+    description,
+    lampType,
+    lampColor,
+    wattsPer,
+    totalWatts,
+    numberOfLamps,
+    totalLumens,
+  } = body
+  return await RFP.findOne({ projectId: projectId })
+    .exec()
+    .then(async (rfpFound) => {
+      if (rfpFound) {
+        const tableRow = rfpFound.tableRow.length > 0;
+        console.log("TABLE ROW pre item find: ", rfpFound.tableRow)
+        const rowItem = rfpFound.tableRow.slice().find(
+          (item) => (item.itemID == item_ID)
+        );
+        console.log("#########tablerow: ", tableRow)
+        const finishes: any = {
+          exteriorFinish: exteriorFinish,
+          interiorFinish: interiorFinish,
+          lensMaterial: lensMaterial,
+          glassOptions: glassOptions,
+          acrylicOptions: acrylicOptions,
+        };
+        const projectRow = {
+          itemID: item_ID,
+          rooms: [{ name: roomName, roomLights: quantity }], //??
+          lightQuantity: quantity,
+          finishes: finishes,
+          description: description, //need
+          lampType: lampType, //need
+          lampColor: lampColor, //need
+          wattsPer: wattsPer, //need
+          totalWatts: totalWatts * quantity, //need
+          numberOfLamps: numberOfLamps, //need
+          totalLumens: totalLumens * quantity, //need
+          subTableRow: [],
+        };
+        if (tableRow && rowItem) {
+          let runCheck = [];
+            let rowFinishes: any = rowItem.finishes;
+            for (let key in rowFinishes) {
+              console.log("key in rowFinishes: ", key);
+              runCheck.push(rowFinishes[key] == finishes[key]);
+            }
+            if (runCheck.some((item)=> item == false)) {
+              const subs = rowItem.subTableRow;
+              if (subs) {
+                rowItem.subTableRow = [projectRow, ...subs];
+              }
+
+            }
+            const newQuantity = rowItem.lightQuantity + quantity;
+            const newWattage = totalWatts * newQuantity;
+            const newTotalLumens = totalLumens * newQuantity;
+            const rooms = rowItem.rooms
+            rowItem.lightQuantity = newQuantity;
+            rowItem.totalWatts = newWattage;
+            rowItem.totalLumens = newTotalLumens;
+            rowItem.rooms = [{ name: roomName, roomLights: quantity }, ...rooms]
+            rfpFound.tableRow = rfpFound.tableRow.slice()
+              .map((item: ProposalTableRow) => {
+                if(item.itemID === rowItem.itemID) return rowItem;
+                else return item 
+              });
+            console.log("rfpTABLEROW: ",rfpFound.tableRow)
+            try{
+              const done = await rfpFound.save();
+              console.log("======= rfpSuccess update: ", {
+                rfpFound: rfpFound.tableRow,
+                rowItem: rowItem,
+              });
+              if(done) return done
+            }catch (error: any){
+              console.log("===--- Error in update: ", error)
+            }
+          }else{
+          console.log("`````````````TableRow: ", rfpFound.tableRow);
+          const updateRow: ProposalTableRow[] | [] = [
+            projectRow,
+            ...rfpFound.tableRow,
+          ];
+          console.log("UPDAAAAATTTTEEEE ROW: ", updateRow)
+          rfpFound.tableRow = updateRow;
+          console.log("~~~~~~~~~RFPFOUND Yo!: ", rfpFound);
+          try {
+            const done = await rfpFound.save();
+            console.log("~~~rfpSuccess update ADD: ", {
+              rfpFound: rfpFound,
+              newRow: updateRow,
+            });
+            if (done) return done
+          } catch (error: any) {
+            console.log("~~~error in rfpUpdateADD!: ", error);
+          }
+        }
+      }
+    });
+}
 
 const getAllSelectedLights = (req: Request, res: Response) => {
   const { roomId } = req.body;
@@ -115,7 +234,7 @@ const getSelectedLight = async (req: Request, res: Response) => {
   const parameters = Object.fromEntries(
     keys.map((key: string) => [key, req.body[key.toString()]])
   );
-  console.log(parameters, "params object")
+  console.log(parameters, "params object");
   return await LightSelection.findOne({ _id: req.body._id })
     .exec()
     .then((light: any) => {
@@ -150,13 +269,13 @@ const deleteSelectedLight = async (req: Request, res: Response) => {
           .then((lightSelection) => {
             return !lightSelection
               ? res.status(200).json({
-                  lightSelection,
-                })
+                lightSelection,
+              })
               : res.status(404).json({
-                  message:
-                    "The light selection you are looking for no longer exists",
-                  lightRemoved,
-                });
+                message:
+                  "The light selection you are looking for no longer exists",
+                lightRemoved,
+              });
           })
           .catch((error) => {
             res.status(500).json(error);

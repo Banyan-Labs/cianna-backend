@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import LightSelection from "../model/LIghtSelection";
 import Project from "../model/Project";
 import Room from "../model/Room";
+import RFP from "../model/RFP";
 
 const createProject = async (req: Request, res: Response) => {
   const {
@@ -37,6 +38,15 @@ const createProject = async (req: Request, res: Response) => {
         });
       });
   } else {
+    const rfp = new RFP({
+      _id: new mongoose.Types.ObjectId(),
+      header: name + ', ' + region,
+      clientId: clientId,
+      projectId: "",
+      clientName: clientName,
+      tableRow: []
+    })
+
     const project = new Project({
       _id: new mongoose.Types.ObjectId(),
       archived: false,
@@ -46,7 +56,7 @@ const createProject = async (req: Request, res: Response) => {
       region: region,
       status: status,
       description: description,
-      rfp: "",
+      rfp: String(rfp._id),
       rooms: [],
       activity: {
         createUpdate: `Created on ${[curDate[1], curDate[2], curDate[0]].join(
@@ -62,10 +72,13 @@ const createProject = async (req: Request, res: Response) => {
         ],
       },
     });
-
+   rfp.projectId = project._id
+   await rfp.save()    
     return await project
       .save()
       .then(async (project) => {
+        if(project){
+          project.rfp = String(rfp._id);
         if (_id && copy === "project") {
           if (project) {
             for (let i = 0; i < rooms.length; i++) {
@@ -77,7 +90,7 @@ const createProject = async (req: Request, res: Response) => {
                   console.log(error, "error rinding room line 65");
                 });
             }
-          }
+          }          
           return res.status(201).json({
             project,
             message: `copy of project ${_id}`,
@@ -87,6 +100,7 @@ const createProject = async (req: Request, res: Response) => {
             project,
           });
         }
+      }
       })
       .catch((error) => {
         return res.status(500).json({
