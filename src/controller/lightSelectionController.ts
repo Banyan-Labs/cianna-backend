@@ -167,12 +167,12 @@ const rfpUpdater = async (body: any) => {
           rowItem.totalWatts = newWattage;
           rowItem.totalLumens = newTotalLumens;
           rowItem.rooms = [{ name: roomName, roomLights: quantity }, ...rooms];
-          rfpFound.tableRow = rfpFound.tableRow
-            .slice()
-            .map((item: ProposalTableRow) => {
-              if (item.itemID === rowItem.itemID) return rowItem;
-              else return item;
-            });
+          const runArray = rfpFound.tableRow.map((item: ProposalTableRow) => {
+            if (item.itemID === rowItem.itemID) return rowItem;
+            else return item;
+          });
+          rfpFound.tableRow = runArray
+            
           console.log("rfpTABLEROW: ", rfpFound.tableRow);
           try {
             const done = await rfpFound.save();
