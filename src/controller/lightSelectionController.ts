@@ -111,17 +111,18 @@ const rfpUpdater = async (body: any) => {
     totalWatts,
     numberOfLamps,
     totalLumens,
-  } = body
+  } = body;
   return await RFP.findOne({ projectId: projectId })
     .exec()
     .then(async (rfpFound) => {
       if (rfpFound) {
         const tableRow = rfpFound.tableRow.length > 0;
-        console.log("TABLE ROW pre item find: ", rfpFound.tableRow)
-        const rowItem = rfpFound.tableRow.slice().find(
-          (item) => (item.itemID == item_ID)
-        );
-        console.log("#########tablerow: ", tableRow)
+        console.log("TABLE ROW pre item find: ", rfpFound.tableRow);
+        const rowItem = rfpFound.tableRow
+          .slice()
+          .find((item) => item.itemID == item_ID);
+        console.log("#########tablerow: ", tableRow);
+
         const finishes: any = {
           exteriorFinish: exteriorFinish,
           interiorFinish: interiorFinish,
@@ -129,65 +130,68 @@ const rfpUpdater = async (body: any) => {
           glassOptions: glassOptions,
           acrylicOptions: acrylicOptions,
         };
+
         const projectRow = {
           itemID: item_ID,
           rooms: [{ name: roomName, roomLights: quantity }], //??
           lightQuantity: quantity,
           finishes: finishes,
           description: description, //need
-          lampType: lampType, //need
-          lampColor: lampColor, //need
-          wattsPer: wattsPer, //need
-          totalWatts: totalWatts * quantity, //need
-          numberOfLamps: numberOfLamps, //need
-          totalLumens: totalLumens * quantity, //need
+          lampType: lampType, 
+          lampColor: lampColor, 
+          wattsPer: wattsPer, 
+          totalWatts: totalWatts * quantity, 
+          numberOfLamps: numberOfLamps,
+          totalLumens: totalLumens * quantity,
           subTableRow: [],
         };
+
         if (tableRow && rowItem) {
           let runCheck = [];
-            let rowFinishes: any = rowItem.finishes;
-            for (let key in rowFinishes) {
-              console.log("key in rowFinishes: ", key);
-              runCheck.push(rowFinishes[key] == finishes[key]);
+          let rowFinishes: any = rowItem.finishes;
+          for (let key in rowFinishes) {
+            console.log("key in rowFinishes: ", key);
+            runCheck.push(rowFinishes[key] == finishes[key]);
+          }
+          if (runCheck.some((item) => item == false)) {
+            const subs = rowItem.subTableRow;
+            if (subs) {
+              rowItem.subTableRow = [projectRow, ...subs];
             }
-            if (runCheck.some((item)=> item == false)) {
-              const subs = rowItem.subTableRow;
-              if (subs) {
-                rowItem.subTableRow = [projectRow, ...subs];
-              }
-
-            }
-            const newQuantity = rowItem.lightQuantity + quantity;
-            const newWattage = totalWatts * newQuantity;
-            const newTotalLumens = totalLumens * newQuantity;
-            const rooms = rowItem.rooms
-            rowItem.lightQuantity = newQuantity;
-            rowItem.totalWatts = newWattage;
-            rowItem.totalLumens = newTotalLumens;
-            rowItem.rooms = [{ name: roomName, roomLights: quantity }, ...rooms]
-            rfpFound.tableRow = rfpFound.tableRow.slice()
-              .map((item: ProposalTableRow) => {
-                if(item.itemID === rowItem.itemID) return rowItem;
-                else return item 
-              });
-            console.log("rfpTABLEROW: ",rfpFound.tableRow)
-            try{
-              const done = await rfpFound.save();
-              console.log("======= rfpSuccess update: ", {
-                rfpFound: rfpFound.tableRow,
-                rowItem: rowItem,
-              });
-              if(done) return done
-            }catch (error: any){
-              console.log("===--- Error in update: ", error)
-            }
-          }else{
+          }
+          const newQuantity = rowItem.lightQuantity + quantity;
+          const newWattage = totalWatts * newQuantity;
+          const newTotalLumens = totalLumens * newQuantity;
+          const rooms = rowItem.rooms;
+          rowItem.lightQuantity = newQuantity;
+          rowItem.totalWatts = newWattage;
+          rowItem.totalLumens = newTotalLumens;
+          rowItem.rooms = [{ name: roomName, roomLights: quantity }, ...rooms];
+          rfpFound.tableRow = rfpFound.tableRow
+            .slice()
+            .map((item: ProposalTableRow) => {
+              if (item.itemID === rowItem.itemID) return rowItem;
+              else return item;
+            });
+          console.log("rfpTABLEROW: ", rfpFound.tableRow);
+          try {
+            const done = await rfpFound.save();
+            console.log("======= rfpSuccess update: ", {
+              rfpFound: rfpFound.tableRow,
+              rowItem: rowItem,
+              done: done
+            });
+            if (done) return done;
+          } catch (error: any) {
+            console.log("===--- Error in update: ", error);
+          }
+        } else {
           console.log("`````````````TableRow: ", rfpFound.tableRow);
           const updateRow: ProposalTableRow[] | [] = [
             projectRow,
             ...rfpFound.tableRow,
           ];
-          console.log("UPDAAAAATTTTEEEE ROW: ", updateRow)
+          console.log("UPDAAAAATTTTEEEE ROW: ", updateRow);
           rfpFound.tableRow = updateRow;
           console.log("~~~~~~~~~RFPFOUND Yo!: ", rfpFound);
           try {
@@ -196,14 +200,14 @@ const rfpUpdater = async (body: any) => {
               rfpFound: rfpFound,
               newRow: updateRow,
             });
-            if (done) return done
+            if (done) return done;
           } catch (error: any) {
             console.log("~~~error in rfpUpdateADD!: ", error);
           }
         }
       }
     });
-}
+};
 
 const getAllSelectedLights = (req: Request, res: Response) => {
   const { roomId } = req.body;
@@ -269,13 +273,13 @@ const deleteSelectedLight = async (req: Request, res: Response) => {
           .then((lightSelection) => {
             return !lightSelection
               ? res.status(200).json({
-                lightSelection,
-              })
+                  lightSelection,
+                })
               : res.status(404).json({
-                message:
-                  "The light selection you are looking for no longer exists",
-                lightRemoved,
-              });
+                  message:
+                    "The light selection you are looking for no longer exists",
+                  lightRemoved,
+                });
           })
           .catch((error) => {
             res.status(500).json(error);
