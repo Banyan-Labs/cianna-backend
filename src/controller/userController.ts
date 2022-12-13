@@ -13,7 +13,7 @@ const login = async (req: Request, res: Response) => {
   User.findOne({ email })
     .select("+password")
     .then(async (user) => {
-      if (!user) res.status(404).json({ message: "User not found" });
+      if (!user) return res.status(404).json({ message: "User not found" });
       if (user) {
         const match = await bcrypt.compare(password, user.password);
         if (match) {
@@ -45,7 +45,7 @@ const login = async (req: Request, res: Response) => {
                 path: "/",
                 secure: true,
               });
-              res.json({
+              return res.json({
                 accessToken,
                 user: {
                   _id: authenticatedUser._id,
@@ -57,10 +57,10 @@ const login = async (req: Request, res: Response) => {
             })
             .catch((error) => {
               console.log(error.message);
-              res.sendStatus(401);
+              return res.sendStatus(401);
             });
         } else {
-          res
+          return res
             .status(401)
             .json({ message: "The password you entered is incorrect." });
         }
