@@ -9,8 +9,8 @@
     "start:server:debug": "ts-node --inspect server.ts",
     "start:test": "ts-node index.ts",
     "build": "webpack",
-    "start:build": "node build/server.js",
-    "debug:build": "node --inspect build/server.js"
+    "start:build": "node dist/server.js",
+    "debug:build": "node --inspect dist/server.js"
   },
   "author": "",
   "license": "ISC",
