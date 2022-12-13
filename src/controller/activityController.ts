@@ -7,16 +7,16 @@ import Activity from "../model/ActivityLog";
 const createActivityLog = async (req: Request, res: Response, next: NextFunction) => {
   const { name, userId, ipAddress, role } = req.body;
 console.log(req.body)
-  const UpdateIpAddress = await Activity.findOne({ ipAddress:ipAddress })
+   await Activity.findOne({ ipAddress:ipAddress })
     .exec()
     .then((log) => {
       if (log) {
-        console.log(log, 'got it')
+        // console.log(log, 'got it')
         log.ipAddress = ipAddress;
         console.log(log.ipAddress)
         log.save()
           .then((updatedLog) => {
-            console.log(updatedLog, 'updated log')
+            // console.log(updatedLog, 'updated log')
              res.status(201).json({
               updatedLog,
             });
@@ -40,7 +40,6 @@ console.log(req.body)
         activityLog
         .save()
         .then((result) => {
-          console.log(result)
           res.status(201).json({
             log: {
               _id: result.id,
