@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import { Finish, ProposalTableRow } from "../interfaces/rfpDocInterface";
+// import { Finish } from "../interfaces/rfpDocInterface";
 import LightSelection from "../model/LIghtSelection";
 import RFP from "../model/RFP";
+import ProposalTableRow from "../model/ProposalTableRow";
 import Room from "../model/Room";
 
 const lightSelected = async (
@@ -30,6 +31,8 @@ const lightSelected = async (
     projectId,
     clientId,
     quantity,
+    price,
+    propID
   } = req.body.light;
 
   const light = new LightSelection({
@@ -53,6 +56,7 @@ const lightSelected = async (
     projectId,
     clientId,
     quantity,
+    
   });
   const lightAndRoom = await Room.findByIdAndUpdate({ _id: roomId })
     .exec()
@@ -65,13 +69,12 @@ const lightSelected = async (
           .save()
           .then(async (light) => {
             if (light) {
-              const updated = await rfpUpdater(req.body.light);
-              if (updated) {
+              
                 return res.status(201).json({
                   light,
                   message: roomSuccess,
                 });
-              }
+              
             }
           })
           .catch((error) => {
@@ -93,121 +96,7 @@ const lightSelected = async (
 
   return lightAndRoom;
 };
-const rfpUpdater = async (body: any) => {
-  const {
-    item_ID,
-    exteriorFinish,
-    interiorFinish,
-    lensMaterial,
-    glassOptions,
-    acrylicOptions,
-    roomName,
-    projectId,
-    quantity,
-    description,
-    lampType,
-    lampColor,
-    wattsPer,
-    totalWatts,
-    numberOfLamps,
-    totalLumens,
-  } = body;
-  return await RFP.findOne({ projectId: projectId })
-    .exec()
-    .then(async (rfpFound) => {
-      if (rfpFound) {
-        const tableRow = rfpFound.tableRow.length > 0;
-        console.log("TABLE ROW pre item find: ", rfpFound.tableRow);
-        const rowItem = rfpFound.tableRow
-          .slice()
-          .find((item) => item.itemID == item_ID);
-        console.log("#########tablerow: ", tableRow);
 
-        const finishes: any = {
-          exteriorFinish: exteriorFinish,
-          interiorFinish: interiorFinish,
-          lensMaterial: lensMaterial,
-          glassOptions: glassOptions,
-          acrylicOptions: acrylicOptions,
-        };
-
-        const projectRow = {
-          itemID: item_ID,
-          rooms: [{ name: roomName, roomLights: quantity }], //??
-          lightQuantity: quantity,
-          finishes: finishes,
-          description: description, //need
-          lampType: lampType, 
-          lampColor: lampColor, 
-          wattsPer: wattsPer, 
-          totalWatts: totalWatts * quantity, 
-          numberOfLamps: numberOfLamps,
-          totalLumens: totalLumens * quantity,
-          subTableRow: [],
-        };
-
-        if (tableRow && rowItem) {
-          let runCheck = [];
-          let rowFinishes: any = rowItem.finishes;
-          for (let key in rowFinishes) {
-            console.log("key in rowFinishes: ", key);
-            runCheck.push(rowFinishes[key] == finishes[key]);
-          }
-          if (runCheck.some((item) => item == false)) {
-            const subs = rowItem.subTableRow;
-            if (subs) {
-              rowItem.subTableRow = [projectRow, ...subs];
-            }
-          }
-          const newQuantity = rowItem.lightQuantity + quantity;
-          const newWattage = totalWatts * newQuantity;
-          const newTotalLumens = totalLumens * newQuantity;
-          const rooms = rowItem.rooms;
-          rowItem.lightQuantity = newQuantity;
-          rowItem.totalWatts = newWattage;
-          rowItem.totalLumens = newTotalLumens;
-          rowItem.rooms = [{ name: roomName, roomLights: quantity }, ...rooms];
-          const runArray = rfpFound.tableRow.map((item: ProposalTableRow) => {
-            if (item.itemID === rowItem.itemID) return rowItem;
-            else return item;
-          });
-          rfpFound.tableRow = runArray
-            
-          console.log("rfpTABLEROW: ", rfpFound.tableRow);
-          try {
-            const done = await rfpFound.save();
-            console.log("======= rfpSuccess update: ", {
-              rfpFound: rfpFound.tableRow,
-              rowItem: rowItem,
-              done: done
-            });
-            if (done) return done;
-          } catch (error: any) {
-            console.log("===--- Error in update: ", error);
-          }
-        } else {
-          console.log("`````````````TableRow: ", rfpFound.tableRow);
-          const updateRow: ProposalTableRow[] | [] = [
-            projectRow,
-            ...rfpFound.tableRow,
-          ];
-          console.log("UPDAAAAATTTTEEEE ROW: ", updateRow);
-          rfpFound.tableRow = updateRow;
-          console.log("~~~~~~~~~RFPFOUND Yo!: ", rfpFound);
-          try {
-            const done = await rfpFound.save();
-            console.log("~~~rfpSuccess update ADD: ", {
-              rfpFound: rfpFound,
-              newRow: updateRow,
-            });
-            if (done) return done;
-          } catch (error: any) {
-            console.log("~~~error in rfpUpdateADD!: ", error);
-          }
-        }
-      }
-    });
-};
 
 const getAllSelectedLights = (req: Request, res: Response) => {
   const { roomId } = req.body;
