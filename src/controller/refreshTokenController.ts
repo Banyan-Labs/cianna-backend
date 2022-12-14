@@ -25,7 +25,7 @@ const refreshTokenController = (req: Request, res: Response) => {
           const accessToken = jwt.sign(
             { name: user.email, role },
             process.env.ACCESS_TOKEN_SECRET as string,
-            { expiresIn: "3500s" }
+            { expiresIn: "1d" }
           );
           res.json({
             accessToken,

@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 import Project from "../model/Project";
 import { uploadFunc } from "../middleware/s3";
-import RFP from "../model/RFP";
+import RFP  from "../model/RFP";
+import ProposalTableRow from "../model/ProposalTableRow";
 
 const createRfp = async (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -119,11 +120,149 @@ const getAccountRFPS = async (req: Request, res: Response) => {
       return res.status(500).json({ message: error.message, error });
     });
 };
+const rfpUpdater = async (req:Request, res: Response) => {
+  const {
+    item_ID,
+    exteriorFinish,
+    interiorFinish,
+    lensMaterial,
+    glassOptions,
+    acrylicOptions,
+    roomName,
+    projectId,
+    quantity,
+    description,
+    lampType,
+    lampColor,
+    price,
+    wattsPer,
+    totalWatts,
+    numberOfLamps,
+    totalLumens,
+    propID
+  } = req.body.light;
+  const finishes: any = {
+    exteriorFinish: exteriorFinish,
+    interiorFinish: interiorFinish,
+    lensMaterial: lensMaterial,
+    glassOptions: glassOptions,
+    acrylicOptions: acrylicOptions,
+  };
+  console.log("$$$$$$$$$$$$$$$ PROP ID: ",propID)
+  const proposal =  new ProposalTableRow({
+    _id: new mongoose.Types.ObjectId(),
+    sub: propID ? propID : '',
+    itemID: item_ID,
+    projectId,
+    description,
+    lampType,
+    lampColor,
+    price,
+    lightQuantity: quantity,
+    wattsPer,
+    totalWatts: totalWatts * quantity,
+    numberOfLamps,
+    totalLumens: totalLumens * quantity,
+    finishes,
+    rooms: [{name: roomName, lightNumber: quantity}],
+    subTableRow: [],
+  })
+  await proposal.save()
+  if(propID){
+    const updateProp = await ProposalTableRow.findByIdAndUpdate({_id: propID})
+          .exec()
+          .then(async(propFound)=>{
+            if( propFound ){
+            let runCheck = [];
+            let rowFinishes: any = propFound.finishes;
+            for (let key in rowFinishes) {
+              console.log("key in rowFinishes: ", key);
+              runCheck.push(rowFinishes[key] == finishes[key]);
+            }
+            if (runCheck.some((item) => item == false)) {
+              const subs = propFound.subTableRow;
+              console.log("Subs triggered in update: ", subs)
+              if (subs) {
+              propFound.subTableRow = [String(proposal._id), ...subs];
+              }
+            }
+            const newQuantity = propFound.lightQuantity + quantity;
+            const newWattage = totalWatts * newQuantity;
+            const newTotalLumens = totalLumens * newQuantity;
+            const rooms = [ {name:roomName, roomLights: quantity}, ...propFound.rooms];
+            if(newQuantity && newWattage && newTotalLumens && rooms){
+            propFound.lightQuantity = newQuantity;
+            propFound.totalWatts = newWattage;
+            propFound.totalLumens = newTotalLumens;
+            propFound.rooms = rooms;
+            }
+            const done = await propFound.save();
+            if(done){
+              console.log("DONE UPDATE~~~~~~~~~~~: ", {
+                propFoundDone: done,
+                newProposal: proposal
+              })
+              return res.status(200).json({
+                message: 'Successful Update',
+                done
+              })
+            }
+
+            }
+          }).catch((error: any)=>{
+            console.log("ERROR on UPDATE prop: ", error)
+            return {
+              message: error.message
+            }
+          })
+      return updateProp;
+  }else{
+    const updateRfp =  await RFP.findOne({projectId: projectId})
+          .exec()
+          .then(async(rfp)=>{
+            if(rfp){
+              console.log("inRFP add ====: ", rfp)
+              const newRow = [String(proposal._id), ...rfp.tableRow]
+              rfp.tableRow = newRow;
+              const done = await rfp.save();
+              if(done){
+                 console.log("DONE ADD ========= : ", {
+                 rfpFoundDone: done,
+                 newProposal: proposal
+                })
+                return res.status(200).json({
+                  message: 'Successful Add',
+                  done
+                })
+              }
+
+            }
+          }).catch((error: any)=>{
+            console.log("ERROR on ADD rfp stuff: ", error)
+            return res.status(500).json({ message: error.message, error });
+          })
+      return updateRfp;
+      } 
+};
+const getProposalRows = async (req: Request, res: Response) =>{
+  return await ProposalTableRow.find({projectId: req.body.projectId})
+    .exec()
+    .then((proposal) => {
+      return res.status(200).json({
+        message: "Proposal Rows Found",
+        proposal,
+      });
+    })
+    .catch((error) => {
+      return res.status(500).json({ message: error.message, error });
+    });
+}
 const getRFPS = async (req: Request, res: Response) => {
-  return await RFP.find()
+  return await RFP.find({projectId: req.body.projectId})
     .exec()
     .then((rfp) => {
       return res.status(200).json({
+        message: 'RFP Found',
         rfp,
       });
     })
@@ -164,4 +303,4 @@ const deleteRFP = async (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export default { createRfp, getRFPS, getAccountRFPS, findRFP, deleteRFP };
+export default { createRfp, getRFPS, getAccountRFPS, findRFP, deleteRFP, rfpUpdater, getProposalRows };

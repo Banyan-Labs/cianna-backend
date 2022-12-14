@@ -43,9 +43,12 @@ router
     lightSelectionController.deleteSelectedLight
   )
   // Rfp Routes
-  .get("/get-rfps", rfpController.getRFPS)
   .post("/create-rfp", multiUpload, rfpController.createRfp)
   .post("/account-rfps", rfpController.getAccountRFPS)
   .post("/find-rfp", rfpController.findRFP)
-  .delete("/delete-rfp", rfpController.deleteRFP);
+  //newRFP
+  .post("/get-rfps", rfpController.getRFPS)
+  .post("/update-rfp", rfpController.rfpUpdater)
+  .post("/get-proposals", rfpController.getProposalRows)
+  .post("/delete-rfp", rfpController.deleteRFP);//????
 export default router;
