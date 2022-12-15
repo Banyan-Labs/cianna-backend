@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { isArray } from "lodash";
 import mongoose from "mongoose";
 import { uploadFunc } from "../middleware/s3";
 import CatalogItem from "../model/CatalogItem";
@@ -21,10 +22,10 @@ const createCatalogItem = async (req: Request, res: Response) => {
     estimatedWeight,
     price,
     material,
-    lampType, 
-    lampColor, 
-    numberOfLamps, 
-    wattsPerLamp, 
+    lampType,
+    lampColor,
+    numberOfLamps,
+    wattsPerLamp,
     powerInWatts,
     lumens,
     exteriorFinish, //[]
@@ -46,32 +47,31 @@ const createCatalogItem = async (req: Request, res: Response) => {
     partnerCodeAdmin,
   } = req.body;
 
-  let {images, pdf, specs, drawingFiles}  = req.body; //[]//s3
+  let { images, pdf, specs, drawingFiles } = req.body; //[]//s3
   images = [];
   pdf = [];
   specs = [];
   drawingFiles = [];
-  if(req.files){
+  if (req.files) {
+    const documents = Object.values(req.files as any);
 
-  const documents = Object.values(req.files as any);
+    const results = await uploadFunc(documents);
+    if (results?.length) {
+      for (let i = 0; i < results?.length; i++) {
+        for (let j = 0; j < results[i].length; j++) {
+          const singleDoc = await results[i][j];
 
-  const results = await uploadFunc(documents);
-  if (results?.length) {
-    for (let i = 0; i < results?.length; i++) {
-      for (let j = 0; j < results[i].length; j++) {
-        const singleDoc = await results[i][j];
-
-        if (singleDoc.field === "images") {
-          images.push(singleDoc.s3Upload.Location);
-        } else if (singleDoc.field === "drawingFiles") {
-          drawingFiles.push(singleDoc.s3Upload.Location);
-        } else if (singleDoc.field === "pdf") {
-          pdf.push(singleDoc.s3Upload.Location);
-        } else if (singleDoc.field === "specs") {
-          specs.push(singleDoc.s3Upload.Location);
+          if (singleDoc.field === "images") {
+            images.push(singleDoc.s3Upload.Location);
+          } else if (singleDoc.field === "drawingFiles") {
+            drawingFiles.push(singleDoc.s3Upload.Location);
+          } else if (singleDoc.field === "pdf") {
+            pdf.push(singleDoc.s3Upload.Location);
+          } else if (singleDoc.field === "specs") {
+            specs.push(singleDoc.s3Upload.Location);
+          }
         }
       }
-    }
     }
   }
 
@@ -93,10 +93,10 @@ const createCatalogItem = async (req: Request, res: Response) => {
     estimatedWeight,
     price,
     material,
-    lampType, 
-    lampColor, 
-    numberOfLamps, 
-    wattsPerLamp, 
+    lampType,
+    lampColor,
+    numberOfLamps,
+    wattsPerLamp,
     powerInWatts,
     lumens,
     exteriorFinish, //[]
@@ -141,7 +141,6 @@ const getCatalogItems = (req: Request, res: Response) => {
   const check = Object.keys(req.body).filter(
     (x) => x === "designStyle" || x == "usePackages"
   );
-  console.log(check)
   const workArray = Object.fromEntries(check.map((x) => [x, req.body[x]]));
   CatalogItem.find()
     .then((items) => {
@@ -151,13 +150,23 @@ const getCatalogItems = (req: Request, res: Response) => {
         items = items.filter((x) => {
           const dz = designCheck
             ? workArray["designStyle"].every(
-                (v: string) => x.designStyle.indexOf(v) > -1
+                (v: string) =>
+                  x.designStyle[0]
+                    .split(",")
+                    .map((x) => x.toLowerCase())
+                    .indexOf(v) > -1
               )
             : false;
           const uses = useCheck
-            ? workArray["usePackages"].every(
-                (v: string) => x.usePackages.indexOf(v) > -1
-              )
+            ? workArray["usePackages"].every((v: string) => {
+                const usePackage = v.match(/[a-z]/g)?.join("");
+                return x.usePackages[0]
+                  .split(",")
+                  .some(
+                    (x) =>
+                      x.toLowerCase().match(/[a-z]/g)?.join("") == usePackage
+                  );
+              })
             : false;
           if (check.length === 2) {
             if (dz == true && uses == true) {
@@ -186,12 +195,21 @@ const getCatalogItems = (req: Request, res: Response) => {
 };
 
 const getLight = async (req: Request, res: Response) => {
-  const keys = Object.keys(req.body).filter((key: string) => key != "_id" && key != "item_ID"&& key != "authEmail" && key != "authRole");
-  const search = req.body.item_ID && req.body.item_ID.length ? {item_ID: req.body.item_ID} : { _id: req.body._id}
+  const keys = Object.keys(req.body).filter(
+    (key: string) =>
+      key != "_id" &&
+      key != "item_ID" &&
+      key != "authEmail" &&
+      key != "authRole"
+  );
+  const search =
+    req.body.item_ID && req.body.item_ID.length
+      ? { item_ID: req.body.item_ID }
+      : { _id: req.body._id };
   const parameters = Object.fromEntries(
     keys.map((key: string) => [key, req.body[key.toString()]])
   );
-  
+
   return await CatalogItem.findOne(search)
     .exec()
     .then((light: any) => {
@@ -201,7 +219,7 @@ const getLight = async (req: Request, res: Response) => {
         });
         light.save();
       }
-      
+
       console.log(`Catalog Item: ${light?.item_ID} retrieved`);
       return res.status(200).json({
         light,
