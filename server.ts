@@ -1,5 +1,5 @@
 // import http from "http";
-if (process.env.NODE_ENV !== 'deploy') {
+if (process.env.NODE_ENV !== "deploy") {
   require("dotenv").config();
 }
 import express from "express";
@@ -12,12 +12,13 @@ import cors from "cors";
 import mongoose from "mongoose";
 import refreshRoute from "./src/routes/refreshTokenRoute";
 import adminRoutes from "./src/routes/adminRoutes";
-import routes from './src/routes/deployTestRoutes';
+import routes from "./src/routes/deployTestRoutes";
+import https from "https";
 
 import publicRoutes from "./src/routes/publicRoutes";
 import userRoutes from "./src/routes/userRoutes";
 import employeeRoutes from "./src/routes/employeeRoutes";
- 
+
 const router = express();
 
 /** Server Handler */
@@ -53,15 +54,15 @@ router.use((req, res, next) => {
 
 /**Routes */
 
-router.get('/', (req, res) => {
-  return res.send("hello universe")
-})
+router.get("/", (req, res) => {
+  return res.send("hello universe");
+});
 
-router.get('/test', (req, res) => {
-  return res.json({ msg: 'test' })
-})
+router.get("/test", (req, res) => {
+  return res.json({ msg: "test" });
+});
 
-router.use('/api/deploy-test', routes);
+router.use("/api/deploy-test", routes);
 router.use("/api/rf", refreshRoute);
 router.use("/api/cmd", adminRoutes);
 router.use("/api/public", publicRoutes); // << -- crashes app
@@ -71,14 +72,20 @@ router.use("/api/internal", employeeRoutes); //<<-- crashes app
 /**Errors */
 router.use((req, res, next) => {
   const error = new Error("not found");
-  
+
   return res.status(404).json({
     message: error.message,
   });
 });
 
 /**Requests */
-router.listen(config.server.port, () => {
+// router.listen(config.server.port, () => {
+//   logging.info(
+//     `Server is running at ${config.server.host}:${config.server.port}`
+//   );
+// });
+
+https.createServer(router).listen(config.server.port, () => {
   logging.info(
     `Server is running at ${config.server.host}:${config.server.port}`
   );
