@@ -1,16 +1,13 @@
 {
   "name": "cianna-api",
   "version": "1.0.0",
-  "engines": {
-    "node": "18.x",
-    "npm": "8.11.0"
-  },
   "description": "",
   "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon --config nodemon.json server.ts",
     "start:server": "ts-node server.ts",
-    "start:test": "ts-node index.ts"
+    "build": "webpack",
+    "start:build": "node dist/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -35,8 +32,12 @@
     "nodemon": "^2.0.19",
     "pino": "^8.4.2",
     "pino-pretty": "^9.0.1",
+    "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-node-externals": "^3.0.0",
     "yup": "^0.32.11",
     "zod": "^3.18.0"
   },
