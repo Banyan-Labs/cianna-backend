@@ -14,6 +14,7 @@ import refreshRoute from "./src/routes/refreshTokenRoute";
 import adminRoutes from "./src/routes/adminRoutes";
 import routes from "./src/routes/deployTestRoutes";
 import https from "https";
+import fs from "fs";
 
 import publicRoutes from "./src/routes/publicRoutes";
 import userRoutes from "./src/routes/userRoutes";
@@ -40,17 +41,33 @@ mongoose
     logging.error(error);
   });
 
-router.use((req, res, next) => {
-  logging.info(
-    `METHOD: '${req.method}' - URL:'${req.url}' - IP${req.socket.remoteAddress}`
-  );
-  res.on("finish", () => {
+https
+  .createServer(
+    {
+      key: fs.readFileSync("key.pem"),
+      cert: fs.readFileSync("cert.pem"),
+      passphrase: '.'
+    },
+    router
+  )
+  .listen(config.server.port, () => {
     logging.info(
-      `METHOD: '${req.method}' - URL:'${req.url}' - IP${req.socket.remoteAddress} - STATUS: '${res.statusCode}`
+      `Server is running at ${config.server.host}:${config.server.port}`
     );
   });
-  next();
-});
+
+  router.use((req, res, next) => {
+    logging.info(
+      `METHOD: '${req.method}' - URL:'${req.url}' - IP${req.socket.remoteAddress}`
+    );
+    res.on("finish", () => {
+      logging.info(
+        `METHOD: '${req.method}' - URL:'${req.url}' - IP${req.socket.remoteAddress} - STATUS: '${res.statusCode}`
+      );
+    });
+    next();
+  });
+
 
 /**Routes */
 
@@ -84,9 +101,3 @@ router.use((req, res, next) => {
 //     `Server is running at ${config.server.host}:${config.server.port}`
 //   );
 // });
-
-https.createServer(router).listen(config.server.port, () => {
-  logging.info(
-    `Server is running at ${config.server.host}:${config.server.port}`
-  );
-});
