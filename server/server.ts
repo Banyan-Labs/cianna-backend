@@ -30,6 +30,11 @@ router.use(cors(corsOptions)); // add any rules into the corsOptions file.
 router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 router.use(express.static("src"));
+if (process.env.NODE_ENV === "production") {
+  router.use(express.static(path.join(__dirname, "../../client/build")));
+} else {
+  router.use(express.static(path.join(__dirname, "../client/build")));
+}
 
 mongoose
   .connect(config.mongo.url, config.mongo.options)
@@ -54,10 +59,12 @@ router.use((req, res, next) => {
 
 /**Routes */
 
-router.use(express.static(path.join(__dirname, "../client/build")));
-
 router.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../", "client", "build", "index.html"));
+  const homePage =
+    process.env.NODE_ENV === "production"
+      ? path.resolve(__dirname, "../", "../", "client", "build", "index.html")
+      : path.resolve(__dirname, "../", "client", "build", "index.html");
+  res.sendFile(homePage);
 });
 
 router.get("/test", (req, res) => {
