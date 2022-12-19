@@ -331,19 +331,25 @@ const getAccountProjects = async (req: Request, res: Response) => {
 };
 
 const getAllProjects = async (req: Request, res: Response) => {
+  console.log(req.body)
+
   const check = Object.keys(req.body).filter(
     (x) => x != "authEmail" && x != "authRole"
   );
-  const security = check.filter(
+  const security =  check.filter(
     (x) => x === "status" || x === "region" || x === "clientName"
   );
+
   const workingUpdate = Object.fromEntries(
     security.map((x) => [x, req.body[x]])
   );
+  
+  console.log(security, workingUpdate, 'orange')
+   
   if (security.length && check.length === security.length) {
     await Project.find({ ...workingUpdate })
       .then((projects) => {
-        console.log(projects);
+        console.log(projects, 'ornage dskfjdsf' );
         return res.status(200).json({
           projects,
         });
