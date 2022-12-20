@@ -48,7 +48,9 @@ router
   .post("/find-rfp", rfpController.findRFP)
   //newRFP
   .post("/get-rfps", rfpController.getRFPS)
+  .post("/edit-props", rfpController.rfpEditor)
   .post("/update-rfp", rfpController.rfpUpdater)
+  .post("/delete-props", rfpController.deleteProp)
   .post("/get-proposals", rfpController.getProposalRows)
-  .post("/delete-rfp", rfpController.deleteRFP);//????
+  .post("/delete-rfp", rfpController.deleteRFP)
 export default router;

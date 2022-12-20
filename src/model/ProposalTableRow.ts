@@ -5,6 +5,7 @@ const proposalRowSchema: Schema = new Schema(
     _id: { type: mongoose.Types.ObjectId },
     sub: { type: String },
     projectId: { type: String, required: true },
+    lightID: { type: String, required: true },
     itemID: { type: String, required: true },
     description: {type: String, required: true},
     lampType: {type: String, required: true},

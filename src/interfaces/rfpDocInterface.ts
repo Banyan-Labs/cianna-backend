@@ -10,13 +10,14 @@ export interface Finish {
 
 export interface Room {
     name: string;
-    roomLights: number;
+    lightNumber: number;
 }
 
 
 export interface ProposalTableRow {
   sub: string;
   projectId: string;
+  lightID: string;
   itemID: string; // changes on first insertion 
   description: string; // updates on first light insertion
   lampType: string; // changes on first light insertion
