@@ -331,10 +331,10 @@ const getAccountProjects = async (req: Request, res: Response) => {
 };
 
 const getAllProjects = async (req: Request, res: Response) => {
-  console.log(req.body)
+ 
 
   const check = Object.keys(req.body).filter(
-    (x) => x != "authEmail" && x != "authRole"
+    (x) => x != "authEmail" && x != "authRole" && x != "clientId" && x != "type"
   );
   const security =  check.filter(
     (x) => x === "status" || x === "region" || x === "clientName"
@@ -343,15 +343,18 @@ const getAllProjects = async (req: Request, res: Response) => {
   const workingUpdate = Object.fromEntries(
     security.map((x) => [x, req.body[x]])
   );
-  
-  console.log(security, workingUpdate, 'orange')
    
   if (security.length && check.length === security.length) {
+    
     await Project.find({ ...workingUpdate })
-      .then((projects) => {
-        console.log(projects, 'ornage dskfjdsf' );
+      .then(async(projects) => {
+        const {type, clientId} = req.body;
+        const indProj = projects.filter((x) => x.clientId === clientId)
+        
+        // if filtering through only user project
+        const filterProj = await type === 'allProjects' ? projects : indProj;
         return res.status(200).json({
-          projects,
+          filterProj,
         });
       })
       .catch((error) => {
