@@ -331,21 +331,30 @@ const getAccountProjects = async (req: Request, res: Response) => {
 };
 
 const getAllProjects = async (req: Request, res: Response) => {
+ 
+
   const check = Object.keys(req.body).filter(
-    (x) => x != "authEmail" && x != "authRole"
+    (x) => x != "authEmail" && x != "authRole" && x != "clientId" && x != "type"
   );
-  const security = check.filter(
+  const security =  check.filter(
     (x) => x === "status" || x === "region" || x === "clientName"
   );
+
   const workingUpdate = Object.fromEntries(
     security.map((x) => [x, req.body[x]])
   );
+   
   if (security.length && check.length === security.length) {
+    
     await Project.find({ ...workingUpdate })
-      .then((projects) => {
-        console.log(projects);
+      .then(async(projects) => {
+        const {type, clientId} = req.body;
+        const indProj = projects.filter((x) => x.clientId === clientId)
+        
+        // if filtering through only user project
+        const filterProj = await type === 'allProjects' ? projects : indProj;
         return res.status(200).json({
-          projects,
+          filterProj,
         });
       })
       .catch((error) => {
